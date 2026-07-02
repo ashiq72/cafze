@@ -46,9 +46,42 @@ Community-driven event ticketing for organizers and attendees in Bangladesh.
    npm run dev
    ```
 
-4. Open `http://localhost:3010`.
+4. Open `http://localhost:3011`.
 
 Camera scanning works on `localhost` or a deployed HTTPS origin.
+
+## Run with Docker
+
+`NEXT_PUBLIC_*` values are embedded into the browser bundle while the image is
+built. Set them before building; changing them only on `docker run` will not
+change the frontend API target.
+
+Build and start with Docker Compose:
+
+```bash
+docker compose up --build -d
+```
+
+Open `http://localhost:3011`. View logs or stop the app with:
+
+```bash
+docker compose logs -f cafze
+docker compose down
+```
+
+To build and run without Compose:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_API_URL=http://localhost:4000 \
+  --build-arg NEXT_PUBLIC_TENANT_ID=free4mood \
+  -t cafze-web .
+
+docker run --rm -p 3011:3011 cafze-web
+```
+
+For production, replace the API build argument with the public Base360 origin,
+for example `https://base360.onrender.com`. Do not append `/api` or `/api/v1`.
 
 ## API contract
 
