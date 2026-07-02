@@ -70,7 +70,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-black/60" />
           <div className="hero-content relative mx-auto w-full max-w-7xl px-4 pb-16 pt-28 text-white sm:px-6 sm:pb-24">
-            <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase text-[#ffd454]">
+            <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase text-orange-300">
               <Sparkles size={15} />
               Discover, gather, belong
             </p>
@@ -201,7 +201,7 @@ export default function HomePage() {
         <section className="border-y border-border bg-[#f7f9f8]">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
             <div className="max-w-2xl">
-              <p className="text-xs font-extrabold uppercase text-[#c84d43]">
+              <p className="text-xs font-extrabold uppercase text-primary">
                 Explore your kind of crowd
               </p>
               <h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">
@@ -253,7 +253,7 @@ export default function HomePage() {
                 className="aspect-[4/3] h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
               />
               <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-md bg-white/95 px-3 py-2 text-[#173f35] shadow-soft backdrop-blur">
-                <span className="grid h-8 w-8 place-items-center rounded-md bg-[#fbe4df] text-[#c84d43]">
+                <span className="grid h-8 w-8 place-items-center rounded-md bg-secondary text-primary">
                   <UsersRound size={16} />
                 </span>
                 <span>
@@ -265,7 +265,7 @@ export default function HomePage() {
               </div>
             </div>
             <div>
-              <p className="text-xs font-extrabold uppercase text-[#c84d43]">
+              <p className="text-xs font-extrabold uppercase text-primary">
                 More than a booking page
               </p>
               <h2 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl">
@@ -329,7 +329,7 @@ export default function HomePage() {
         <section className="bg-[#173f35] text-white">
           <div className="mx-auto grid max-w-7xl items-center gap-9 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
             <div>
-              <p className="text-xs font-extrabold uppercase text-[#ffd454]">
+              <p className="text-xs font-extrabold uppercase text-orange-300">
                 Door operations
               </p>
               <h2 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl">
@@ -342,11 +342,11 @@ export default function HomePage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-5 text-xs text-white/80">
                 <span className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-[#ffd454]" />
+                  <ShieldCheck size={16} className="text-orange-300" />
                   Duplicate-entry protection
                 </span>
                 <span className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#ffd454]" />
+                  <CheckCircle2 size={16} className="text-orange-300" />
                   Manual ID fallback
                 </span>
               </div>
@@ -371,21 +371,28 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#ffd454] text-[#17342c]">
+        <section className="bg-primary text-primary-foreground">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-12 sm:px-6 md:flex-row md:items-center">
             <div>
               <h2 className="text-2xl font-extrabold sm:text-3xl">
                 Bring your community together
               </h2>
-              <p className="mt-2 text-sm text-[#31554b]">
+              <p className="mt-2 text-sm text-white/80">
                 Create an account, publish an event and start the conversation.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline" className="border-[#17342c]/25">
+              <Button
+                asChild
+                variant="outline"
+                className="border-white/40 bg-transparent text-white hover:bg-white/10"
+              >
                 <Link href="/events">Explore events</Link>
               </Button>
-              <Button asChild>
+              <Button
+                asChild
+                className="bg-white text-primary hover:bg-white/90"
+              >
                 <Link href={signedIn ? "/dashboard/events/new" : "/register"}>
                   Start organizing
                   <ArrowRight size={16} />
@@ -412,9 +419,9 @@ function Value({
   tone: "coral" | "gold" | "green";
 }) {
   const toneClass = {
-    coral: "bg-[#fbe4df] text-[#ba4d43]",
+    coral: "bg-secondary text-primary",
     gold: "bg-[#fff1c6] text-[#8a6416]",
-    green: "bg-secondary text-primary",
+    green: "bg-[#e5f4ef] text-[#16705b]",
   }[tone];
 
   return (
@@ -461,7 +468,7 @@ function DiscoveryTile({
       <div className="absolute inset-0 bg-black/45 transition group-hover:bg-black/55" />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white">
         <span>
-          <span className="text-[10px] font-extrabold uppercase text-[#ffd454]">
+          <span className="text-[10px] font-extrabold uppercase text-orange-300">
             {label}
           </span>
           <strong className="mt-1 block text-lg">{title}</strong>

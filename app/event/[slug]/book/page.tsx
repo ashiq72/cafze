@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
+  Download,
   LoaderCircle,
   Mail,
   MapPin,
@@ -14,7 +15,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ export default function BookingPage() {
   const [result, setResult] = useState<BookingResult | null>(null);
   const [formError, setFormError] = useState("");
   const requestKeyRef = useRef("");
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (!params.slug) return;
@@ -103,6 +105,116 @@ export default function BookingPage() {
     }
   }
 
+  function downloadTicket() {
+    if (!event || !result || !qrCanvasRef.current) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      toast.error("The ticket could not be generated.");
+      return;
+    }
+
+    const ticketName = selectedTicket?.name || "General admission";
+    const ticketPrice = selectedTicket
+      ? selectedTicket.price === 0
+        ? "Free"
+        : formatMoney(selectedTicket.price)
+      : "";
+
+    context.fillStyle = "#f5f7f6";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#ffffff";
+    context.fillRect(60, 50, 960, 1250);
+    context.strokeStyle = "#dce3df";
+    context.lineWidth = 2;
+    context.strokeRect(60, 50, 960, 1250);
+    context.fillStyle = "#f97316";
+    context.fillRect(60, 50, 960, 18);
+
+    context.fillStyle = "#f97316";
+    context.font = "800 38px Arial, sans-serif";
+    context.fillText("CAFZE", 105, 135);
+    context.fillStyle = "#6b756f";
+    context.font = "700 22px Arial, sans-serif";
+    context.textAlign = "right";
+    context.fillText("EVENT ADMISSION", 975, 130);
+    context.textAlign = "left";
+
+    context.fillStyle = "#14231d";
+    context.font = "800 50px Arial, sans-serif";
+    const titleBottom = drawWrappedText(
+      context,
+      event.title,
+      105,
+      225,
+      870,
+      60,
+      2,
+    );
+
+    context.strokeStyle = "#e4e9e6";
+    context.beginPath();
+    context.moveTo(105, titleBottom + 25);
+    context.lineTo(975, titleBottom + 25);
+    context.stroke();
+
+    let detailY = titleBottom + 82;
+    detailY = drawTicketDetail(
+      context,
+      "DATE AND TIME",
+      formatEventDate(event.startsAt),
+      detailY,
+    );
+    detailY = drawTicketDetail(
+      context,
+      "LOCATION",
+      event.location,
+      detailY,
+    );
+    detailY = drawTicketDetail(
+      context,
+      "GUEST",
+      result.attendee.name,
+      detailY,
+    );
+    drawTicketDetail(
+      context,
+      "TICKET",
+      ticketPrice ? `${ticketName} - ${ticketPrice}` : ticketName,
+      detailY,
+    );
+
+    context.imageSmoothingEnabled = false;
+    context.drawImage(qrCanvasRef.current, 360, 805, 360, 360);
+    context.imageSmoothingEnabled = true;
+
+    context.fillStyle = "#14231d";
+    context.font = "800 25px Arial, sans-serif";
+    context.textAlign = "center";
+    context.fillText("Scan at the entrance", 540, 1210);
+    context.fillStyle = "#6b756f";
+    context.font = "20px monospace";
+    context.fillText(`Ticket ${result.ticket.id}`, 540, 1250);
+    context.textAlign = "left";
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        toast.error("The ticket could not be generated.");
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${event.slug}-ticket-${result.ticket.id.slice(-8)}.png`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success("Ticket downloaded");
+    }, "image/png");
+  }
+
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center">
@@ -146,16 +258,14 @@ export default function BookingPage() {
             </p>
 
             <div className="mx-auto mt-7 w-fit rounded-lg border border-border bg-white p-4">
-              {result.ticket.qrCodeUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={result.ticket.qrCodeUrl}
-                  alt="Ticket QR code"
-                  className="h-52 w-52"
-                />
-              ) : (
-                <QRCodeSVG value={qrValue} size={208} level="M" />
-              )}
+              <QRCodeCanvas
+                ref={qrCanvasRef}
+                value={qrValue}
+                size={208}
+                level="M"
+                includeMargin
+                aria-label="Ticket QR code"
+              />
             </div>
             <p className="mt-3 font-mono text-xs text-muted-foreground">
               Ticket {result.ticket.id}
@@ -176,9 +286,15 @@ export default function BookingPage() {
               <strong>{selectedTicket?.name}</strong>
             </div>
           </div>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/events">Explore more events</Link>
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button className="w-full" onClick={downloadTicket}>
+              <Download size={16} />
+              Download ticket
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/events">Explore more events</Link>
+            </Button>
+          </div>
         </main>
       </>
     );
@@ -353,4 +469,62 @@ export default function BookingPage() {
       </main>
     </>
   );
+}
+
+function drawWrappedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines: number,
+) {
+  const words = text.trim().split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (context.measureText(candidate).width <= maxWidth || !current) {
+      current = candidate;
+      continue;
+    }
+    lines.push(current);
+    current = word;
+    if (lines.length === maxLines - 1) break;
+  }
+  if (current && lines.length < maxLines) lines.push(current);
+
+  const consumedWords = lines.join(" ").split(/\s+/).length;
+  if (consumedWords < words.length && lines.length) {
+    let last = lines[lines.length - 1];
+    while (
+      last.length > 1 &&
+      context.measureText(`${last}...`).width > maxWidth
+    ) {
+      last = last.slice(0, -1);
+    }
+    lines[lines.length - 1] = `${last}...`;
+  }
+
+  lines.forEach((line, index) => {
+    context.fillText(line, x, y + index * lineHeight);
+  });
+  return y + Math.max(0, lines.length - 1) * lineHeight;
+}
+
+function drawTicketDetail(
+  context: CanvasRenderingContext2D,
+  label: string,
+  value: string,
+  y: number,
+) {
+  context.fillStyle = "#78837d";
+  context.font = "700 18px Arial, sans-serif";
+  context.fillText(label, 105, y);
+  context.fillStyle = "#14231d";
+  context.font = "700 27px Arial, sans-serif";
+  drawWrappedText(context, value, 105, y + 38, 870, 34, 2);
+  return y + 105;
 }
