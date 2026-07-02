@@ -3,8 +3,11 @@ import axios from "axios";
 export const TOKEN_KEY = "cafze_access_token";
 export const AUTH_CHANGED_EVENT = "cafze-auth-changed";
 
+const configuredApiUrl =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
+  baseURL: getApiOrigin(configuredApiUrl),
   headers: {
     "Content-Type": "application/json",
   },
@@ -122,4 +125,13 @@ export function normalizeId<T extends { id?: string; _id?: string }>(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function getApiOrigin(value: string) {
+  const normalized = value.trim().replace(/\/+$/, "");
+  try {
+    return new URL(normalized).origin;
+  } catch {
+    return normalized.replace(/\/api\/v1$/i, "");
+  }
 }
