@@ -35,7 +35,7 @@ Community-driven event ticketing for organizers and attendees in Bangladesh.
 2. Set the API origin in `.env.local`:
 
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:4000
+   NEXT_PUBLIC_API_URL=https://api.cafze.com
    NEXT_PUBLIC_TENANT_ID=free4mood
    ```
 
@@ -73,7 +73,7 @@ To build and run without Compose:
 
 ```bash
 docker build \
-  --build-arg NEXT_PUBLIC_API_URL=http://localhost:4000 \
+  --build-arg NEXT_PUBLIC_API_URL=https://api.cafze.com \
   --build-arg NEXT_PUBLIC_TENANT_ID=free4mood \
   -t cafze-web .
 

@@ -14,7 +14,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_API_URL=http://localhost:4000
+ARG NEXT_PUBLIC_API_URL=https://api.cafze.com
 ARG NEXT_PUBLIC_TENANT_ID=free4mood
 
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
