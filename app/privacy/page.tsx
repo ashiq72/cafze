@@ -273,25 +273,16 @@ export default function PrivacyPolicyPage() {
                 Cafze
               </p>
 
-              <p className="mt-2 text-gray-600">
-                Email:{" "}
-                <a
-                  href="mailto:your-email@example.com"
-                  className="text-blue-600 hover:underline"
-                >
-                  your-email@example.com
-                </a>
-              </p>
-
+            
               <p className="mt-1 text-gray-600">
                 Website:{" "}
                 <a
-                  href="https://yourwebsite.com"
+                  href="https://cafze.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  yourwebsite.com
+                  cafze.vercel.app
                 </a>
               </p>
             </div>
